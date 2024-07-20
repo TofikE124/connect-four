@@ -77,7 +77,7 @@ const Button = ({
         className
       )}
     >
-      <div className="w-full">{variant != "icon" ? children : null}</div>
+      {variant != "icon" ? <div className="w-full">{children}</div> : null}
 
       {icon && variant == "text-with-icon" ? (
         <Image
@@ -89,7 +89,9 @@ const Button = ({
         />
       ) : null}
       {icon && variant == "icon" ? (
-        <Image src={icon} width={30} height={20} alt="Icon" />
+        <div className="size-full grid place-items-center">
+          <Image src={icon} width={30} height={20} alt="Icon" />
+        </div>
       ) : null}
     </button>
   );

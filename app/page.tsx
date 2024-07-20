@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Button from "../components/Button";
 
-import logo from "/public/images/logo.svg";
-import PlayerVSPlayer from "/public/images/player-vs-player.svg";
-import PlayerVSCPU from "/public/images/player-vs-cpu.svg";
 import Link from "next/link";
+import logo from "/public/images/logo.svg";
+import PlayerVSCPU from "/public/images/player-vs-cpu.svg";
+import PlayerVSPlayer from "/public/images/player-vs-player.svg";
 
 export default function Home() {
   return (
@@ -40,9 +40,11 @@ export default function Home() {
                 Player VS CPU
               </Button>
             </Link>
-            <Button color="white" variant="text" textPosition="left">
-              Game Rules
-            </Button>
+            <Link href="/rules">
+              <Button color="white" variant="text" textPosition="left">
+                Game Rules
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

@@ -24,6 +24,28 @@ const config: Config = {
       },
     },
     extend: {
+      animation: {
+        "pulse-fast": "pulse 1s linear infinite",
+      },
+      gridTemplateAreas: {
+        gameLayoutLarge: [". header .", "playerOne chart playerTwo"],
+        gameLayoutTablet: [
+          "header header",
+          "playerOne playerTwo",
+          "chart chart",
+        ],
+        gameLayoutMobile: [
+          "header header",
+          "playerOne playerTwo",
+          "chart chart",
+        ],
+      },
+      gridTemplateColumns: {
+        gameLayoutLarge: "max-content 1fr max-content",
+        gameLayoutTablet: "1fr 1fr",
+        gameLayoutMobile: "1fr 1fr",
+      },
+      gridTemplateRows: {},
       colors: {
         black: "#000",
         purple: "#7945FF",
@@ -32,8 +54,13 @@ const config: Config = {
         yellow: "#FFCE67",
         white: "#fff",
       },
+
+      boxShadow: {
+        disc: "0px 5px 0px 0px rgba(0,0,0),inset 0px 5px 0px 0px rgba(0,0,0,0.5)",
+        "disc-empty": "inset 0px 10px 0px 0px rgba(0,0,0)",
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@savvywombat/tailwindcss-grid-areas")],
 };
 export default config;

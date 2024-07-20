@@ -10,12 +10,15 @@
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
+    "framer-motion": "^11.3.7",
     "next": "14.2.5",
     "react": "^18",
+    "react-confetti": "^6.1.0",
     "react-dom": "^18",
     "tailwind-merge": "^2.4.0"
   },
   "devDependencies": {
+    "@savvywombat/tailwindcss-grid-areas": "^4.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
