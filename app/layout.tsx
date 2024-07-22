@@ -1,9 +1,7 @@
-import GameProvider from "@/providers/GameProvider";
+import { PanelProvider } from "@/providers/PanelProvider";
 import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.scss";
-import { PanelProvider } from "@/providers/PanelProvider";
-import Panels from "@/components/panels/Panels";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -11,7 +9,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Connect 4",
+  title: "Connect 4 | Menu",
   description: "Connect 4 By Tofik Elias",
 };
 

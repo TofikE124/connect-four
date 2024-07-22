@@ -3,6 +3,12 @@ import React from "react";
 
 import CheckIcon from "/public/images/icon-check.svg";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Connect 4 | Rules",
+  description: "Connect 4 Game Rules",
+};
 
 const page = () => {
   return (

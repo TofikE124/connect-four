@@ -122,7 +122,7 @@ const GameProvider = ({ isCpu, children }: GameProviderProps) => {
 
       return () => clearTimeout(timeOut);
     }
-  }, [playerTurn]);
+  }, [playerTurn, gameResult.gameOver]);
 
   useEffect(() => {
     const startCounting = () => {
@@ -156,6 +156,8 @@ const GameProvider = ({ isCpu, children }: GameProviderProps) => {
   };
 
   const chooseDiscCpu = (col: number) => {
+    if (gameResult.gameOver || isPaused) return;
+    if (!isCpuTurn()) return;
     chooseDiscGeneral(col);
   };
 

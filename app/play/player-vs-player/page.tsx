@@ -4,6 +4,12 @@ import GameHeader from "../components/GameHeader";
 import PlayerDetailsOne from "../components/PlayerDetailsOne";
 import PlayerDetailsTwo from "../components/PlayerDetailsTwo";
 import GameProvider from "@/providers/GameProvider";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Connect 4 | Player vs Player",
+  description: "Connect 4 Player vs Player Mode",
+};
 
 const page = () => {
   return (
