@@ -1,12 +1,13 @@
 import Panels from "@/components/panels/Panels";
-import GameGrid from "./GameGrid";
-import GameHeader from "./GameHeader";
-import PlayerDetailsOne from "./PlayerDetailsOne";
-import PlayerDetailsTwo from "./PlayerDetailsTwo";
+import GameGrid from "../components/GameGrid";
+import GameHeader from "../components/GameHeader";
+import PlayerDetailsOne from "../components/PlayerDetailsOne";
+import PlayerDetailsTwo from "../components/PlayerDetailsTwo";
+import GameProvider from "@/providers/GameProvider";
 
 const page = () => {
   return (
-    <>
+    <GameProvider isCpu={false}>
       <Panels></Panels>
       <div className="w-full h-screen bg-purple py-[50px]">
         <div className="max-w-[80rem] mx-auto px-[50px] flex justify-center">
@@ -18,7 +19,7 @@ const page = () => {
           </div>
         </div>
       </div>
-    </>
+    </GameProvider>
   );
 };
 

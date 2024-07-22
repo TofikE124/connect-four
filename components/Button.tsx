@@ -1,7 +1,8 @@
+"use client";
 import { cva, VariantProps } from "class-variance-authority";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
-import React, { ComponentProps, ReactNode } from "react";
+import React, { ComponentProps, ReactNode, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
 const buttonStyles = cva(
@@ -67,8 +68,13 @@ const Button = ({
   color,
   className,
   textPosition,
+  onClick = () => {},
   ...props
 }: ButtonProps) => {
+  const handleClick = (e: any) => {
+    onClick(e);
+  };
+
   return (
     <button
       {...props}
@@ -76,6 +82,7 @@ const Button = ({
         buttonStyles({ color, variant, textPosition }),
         className
       )}
+      onClick={handleClick}
     >
       {variant != "icon" ? <div className="w-full">{children}</div> : null}
 

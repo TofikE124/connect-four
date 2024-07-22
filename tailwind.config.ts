@@ -56,7 +56,7 @@ const config: Config = {
       },
 
       boxShadow: {
-        disc: "0px 5px 0px 0px rgba(0,0,0),inset 0px 5px 0px 0px rgba(0,0,0,0.5)",
+        disc: "inset 0px 5px 0px 0px rgba(0,0,0,0.5)",
         "disc-empty": "inset 0px 10px 0px 0px rgba(0,0,0)",
       },
     },

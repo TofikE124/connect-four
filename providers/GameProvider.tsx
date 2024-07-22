@@ -1,5 +1,12 @@
 "use client";
-import { createContext, PropsWithChildren, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export enum Player {
   PLAYER_ONE = "Player 1",
@@ -16,7 +23,7 @@ type GameContextType = {
   playerOneScore: number;
   playerTwoScore: number;
   playerTurn: Player;
-  chooseDisc: (row: number, col: number) => void;
+  chooseDisc: (col: number) => void;
   mostBottomEmpty: (col: number) => number;
   timeLeft: number;
   gameResult: GameResult;
@@ -25,6 +32,9 @@ type GameContextType = {
   continueGame: () => void;
   restartGame: () => void;
   playAgain: () => void;
+  isCpuTurn: () => boolean;
+  isCpu: boolean;
+  playerNamesMap: Record<Player, string> | null;
 };
 
 type GameResult = {
@@ -36,8 +46,13 @@ type GameResult = {
 
 export const GameContext = createContext<GameContextType | null>(null);
 
-const GameProvider = ({ children }: PropsWithChildren) => {
-  const FULL_TIME = 5;
+interface GameProviderProps {
+  isCpu: boolean;
+  children: ReactNode;
+}
+
+const GameProvider = ({ isCpu, children }: GameProviderProps) => {
+  const FULL_TIME = 20;
 
   const [grid, setGrid] = useState<Disc[][]>([]);
   const [playerOneScore, setPlayerOneScore] = useState(0);
@@ -52,6 +67,13 @@ const GameProvider = ({ children }: PropsWithChildren) => {
   });
   const [isPaused, setIsPaused] = useState(false);
   const [starterPlayer, setStarterPlayer] = useState(Player.PLAYER_ONE);
+  const [playerNamesMap, setPlayersNameMap] = useState<Record<
+    Player,
+    string
+  > | null>(null);
+
+  const playDropSound = useDropAudio();
+  const { playTickingSound, pauseTickingSound } = useTickingSound();
 
   const initializeGrid = () => {
     let newGrid: Disc[][] = [];
@@ -66,13 +88,41 @@ const GameProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     initializeGrid();
+
+    if (isCpu) {
+      setPlayersNameMap({
+        [Player.PLAYER_ONE]: "Player",
+        [Player.PLAYER_TWO]: "CPU",
+      });
+    } else {
+      setPlayersNameMap({
+        [Player.PLAYER_ONE]: "Player 1",
+        [Player.PLAYER_TWO]: "Player2",
+      });
+    }
   }, []);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       nextTurn();
     }
-  }, [timeLeft]);
+
+    if (isPaused) {
+      pauseTickingSound();
+    } else if (timeLeft <= 10) {
+      playTickingSound();
+    } else {
+      pauseTickingSound();
+    }
+  }, [timeLeft, isPaused]);
+
+  useEffect(() => {
+    if (isCpuTurn()) {
+      const timeOut = setTimeout(cpuPlay, 1200);
+
+      return () => clearTimeout(timeOut);
+    }
+  }, [playerTurn]);
 
   useEffect(() => {
     const startCounting = () => {
@@ -85,7 +135,7 @@ const GameProvider = ({ children }: PropsWithChildren) => {
   }, [gameResult.gameOver, isPaused, playerTurn]);
 
   useEffect(() => {
-    const result = checkForGameOver();
+    const result = checkForGameOver(grid);
     if (result.gameOver) {
       handleWinner(result);
     }
@@ -99,8 +149,28 @@ const GameProvider = ({ children }: PropsWithChildren) => {
     else setPlayerTwoScore((score) => score + 1);
   };
 
-  const chooseDisc = (row: number, col: number) => {
+  const chooseDisc = (col: number) => {
     if (gameResult.gameOver || isPaused) return;
+    if (isCpuTurn()) return;
+    chooseDiscGeneral(col);
+  };
+
+  const chooseDiscCpu = (col: number) => {
+    chooseDiscGeneral(col);
+  };
+
+  const cpuPlay = () => {
+    const cpuMove = getCpuMove(grid);
+    if (cpuMove == -1) return;
+    chooseDiscCpu(cpuMove);
+  };
+
+  const isCpuTurn = () => {
+    return playerTurn == Player.PLAYER_TWO && isCpu;
+  };
+
+  const chooseDiscGeneral = (col: number) => {
+    const row = mostBottomEmpty(col);
     setGrid((prevGrid) =>
       prevGrid.map((r, i) =>
         r.map((el, j) =>
@@ -109,6 +179,7 @@ const GameProvider = ({ children }: PropsWithChildren) => {
       )
     );
     nextTurn();
+    playDropSound();
   };
 
   const nextTurn = () => {
@@ -163,168 +234,6 @@ const GameProvider = ({ children }: PropsWithChildren) => {
     setIsPaused(false);
   };
 
-  const checkForGameOver = (): GameResult => {
-    const numRows = grid.length;
-    const numCols = grid[0]?.length;
-    const winLength = 4; // Connect 4 requires four in a row
-
-    const winningDiscs: Disc[] = [];
-    const winningCoords: { row: number; col: number }[] = [];
-
-    if (!grid.length)
-      return {
-        gameOver: false,
-        winner: null,
-        winningCoords: [],
-        winningDiscs: [],
-      };
-
-    // Check for horizontal locations
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col <= numCols - winLength; col++) {
-        if (
-          grid[row][col].player !== null &&
-          grid[row][col].player === grid[row][col + 1].player &&
-          grid[row][col].player === grid[row][col + 2].player &&
-          grid[row][col].player === grid[row][col + 3].player
-        ) {
-          winningDiscs.push(
-            grid[row][col],
-            grid[row][col + 1],
-            grid[row][col + 2],
-            grid[row][col + 3]
-          );
-          winningCoords.push(
-            { row, col },
-            { row, col: col + 1 },
-            { row, col: col + 2 },
-            { row, col: col + 3 }
-          );
-          return {
-            gameOver: true,
-            winner: grid[row][col].player,
-            winningDiscs,
-            winningCoords,
-          };
-        }
-      }
-    }
-
-    // Check for vertical locations
-    for (let col = 0; col < numCols; col++) {
-      for (let row = 0; row <= numRows - winLength; row++) {
-        if (
-          grid[row][col].player !== null &&
-          grid[row][col].player === grid[row + 1][col].player &&
-          grid[row][col].player === grid[row + 2][col].player &&
-          grid[row][col].player === grid[row + 3][col].player
-        ) {
-          winningDiscs.push(
-            grid[row][col],
-            grid[row + 1][col],
-            grid[row + 2][col],
-            grid[row + 3][col]
-          );
-          winningCoords.push(
-            { row, col },
-            { row: row + 1, col },
-            { row: row + 2, col },
-            { row: row + 3, col }
-          );
-          return {
-            gameOver: true,
-            winner: grid[row][col].player,
-            winningDiscs,
-            winningCoords,
-          };
-        }
-      }
-    }
-
-    // Check for diagonal locations (top-left to bottom-right)
-    for (let row = 0; row <= numRows - winLength; row++) {
-      for (let col = 0; col <= numCols - winLength; col++) {
-        if (
-          grid[row][col].player !== null &&
-          grid[row][col].player === grid[row + 1][col + 1].player &&
-          grid[row][col].player === grid[row + 2][col + 2].player &&
-          grid[row][col].player === grid[row + 3][col + 3].player
-        ) {
-          winningDiscs.push(
-            grid[row][col],
-            grid[row + 1][col + 1],
-            grid[row + 2][col + 2],
-            grid[row + 3][col + 3]
-          );
-          winningCoords.push(
-            { row, col },
-            { row: row + 1, col: col + 1 },
-            { row: row + 2, col: col + 2 },
-            { row: row + 3, col: col + 3 }
-          );
-          return {
-            gameOver: true,
-            winner: grid[row][col].player,
-            winningDiscs,
-            winningCoords,
-          };
-        }
-      }
-    }
-
-    // Check for diagonal locations (bottom-left to top-right)
-    for (let row = numRows - 1; row >= winLength - 1; row--) {
-      for (let col = 0; col <= numCols - winLength; col++) {
-        if (
-          grid[row][col].player !== null &&
-          grid[row][col].player === grid[row - 1][col + 1].player &&
-          grid[row][col].player === grid[row - 2][col + 2].player &&
-          grid[row][col].player === grid[row - 3][col + 3].player
-        ) {
-          winningDiscs.push(
-            grid[row][col],
-            grid[row - 1][col + 1],
-            grid[row - 2][col + 2],
-            grid[row - 3][col + 3]
-          );
-          winningCoords.push(
-            { row, col },
-            { row: row - 1, col: col + 1 },
-            { row: row - 2, col: col + 2 },
-            { row: row - 3, col: col + 3 }
-          );
-          return {
-            gameOver: true,
-            winner: grid[row][col].player,
-            winningDiscs,
-            winningCoords,
-          };
-        }
-      }
-    }
-
-    // Check for a draw
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numCols; col++) {
-        if (grid[row][col].player === null) {
-          return {
-            gameOver: false,
-            winner: null,
-            winningDiscs: [],
-            winningCoords: [],
-          }; // Game is not over yet
-        }
-      }
-    }
-
-    return {
-      gameOver: true,
-      winner: null,
-      winningDiscs: [],
-      winningCoords: [],
-    }; // It's a draw
-  };
-
   return (
     <GameContext.Provider
       value={{
@@ -341,11 +250,257 @@ const GameProvider = ({ children }: PropsWithChildren) => {
         continueGame,
         playAgain,
         restartGame,
+        isCpuTurn,
+        isCpu,
+        playerNamesMap,
       }}
     >
       {children}
     </GameContext.Provider>
   );
+};
+
+function useDropAudio() {
+  const audioRef = useRef(new Audio("/sounds/drop.mp3"));
+
+  const playSound = useCallback(() => {
+    if (audioRef.current) {
+      // Stop any currently playing sound
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    }
+  }, []);
+
+  return playSound;
+}
+
+function useTickingSound() {
+  const audioRef = useRef(new Audio("/sounds/timer-ticking.mp3"));
+
+  const playTickingSound = useCallback(() => {
+    if (audioRef.current) {
+      // Stop any currently playing sound
+      if (audioRef.current.paused) audioRef.current.play();
+    }
+  }, []);
+
+  const pauseTickingSound = useCallback(() => {
+    if (audioRef.current) {
+      // Stop any currently playing sound
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, []);
+
+  return {
+    playTickingSound,
+    pauseTickingSound,
+    isTickingPlayingPlaying: !audioRef.current.paused,
+  };
+}
+
+const checkForGameOver = (grid: Disc[][]): GameResult => {
+  const numRows = grid.length;
+  const numCols = grid[0]?.length;
+  const winLength = 4; // Connect 4 requires four in a row
+
+  const winningDiscs: Disc[] = [];
+  const winningCoords: { row: number; col: number }[] = [];
+
+  if (!grid.length)
+    return {
+      gameOver: false,
+      winner: null,
+      winningCoords: [],
+      winningDiscs: [],
+    };
+
+  // Check for horizontal locations
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col <= numCols - winLength; col++) {
+      if (
+        grid[row][col].player !== null &&
+        grid[row][col].player === grid[row][col + 1].player &&
+        grid[row][col].player === grid[row][col + 2].player &&
+        grid[row][col].player === grid[row][col + 3].player
+      ) {
+        winningDiscs.push(
+          grid[row][col],
+          grid[row][col + 1],
+          grid[row][col + 2],
+          grid[row][col + 3]
+        );
+        winningCoords.push(
+          { row, col },
+          { row, col: col + 1 },
+          { row, col: col + 2 },
+          { row, col: col + 3 }
+        );
+        return {
+          gameOver: true,
+          winner: grid[row][col].player,
+          winningDiscs,
+          winningCoords,
+        };
+      }
+    }
+  }
+
+  // Check for vertical locations
+  for (let col = 0; col < numCols; col++) {
+    for (let row = 0; row <= numRows - winLength; row++) {
+      if (
+        grid[row][col].player !== null &&
+        grid[row][col].player === grid[row + 1][col].player &&
+        grid[row][col].player === grid[row + 2][col].player &&
+        grid[row][col].player === grid[row + 3][col].player
+      ) {
+        winningDiscs.push(
+          grid[row][col],
+          grid[row + 1][col],
+          grid[row + 2][col],
+          grid[row + 3][col]
+        );
+        winningCoords.push(
+          { row, col },
+          { row: row + 1, col },
+          { row: row + 2, col },
+          { row: row + 3, col }
+        );
+        return {
+          gameOver: true,
+          winner: grid[row][col].player,
+          winningDiscs,
+          winningCoords,
+        };
+      }
+    }
+  }
+
+  // Check for diagonal locations (top-left to bottom-right)
+  for (let row = 0; row <= numRows - winLength; row++) {
+    for (let col = 0; col <= numCols - winLength; col++) {
+      if (
+        grid[row][col].player !== null &&
+        grid[row][col].player === grid[row + 1][col + 1].player &&
+        grid[row][col].player === grid[row + 2][col + 2].player &&
+        grid[row][col].player === grid[row + 3][col + 3].player
+      ) {
+        winningDiscs.push(
+          grid[row][col],
+          grid[row + 1][col + 1],
+          grid[row + 2][col + 2],
+          grid[row + 3][col + 3]
+        );
+        winningCoords.push(
+          { row, col },
+          { row: row + 1, col: col + 1 },
+          { row: row + 2, col: col + 2 },
+          { row: row + 3, col: col + 3 }
+        );
+        return {
+          gameOver: true,
+          winner: grid[row][col].player,
+          winningDiscs,
+          winningCoords,
+        };
+      }
+    }
+  }
+
+  // Check for diagonal locations (bottom-left to top-right)
+  for (let row = numRows - 1; row >= winLength - 1; row--) {
+    for (let col = 0; col <= numCols - winLength; col++) {
+      if (
+        grid[row][col].player !== null &&
+        grid[row][col].player === grid[row - 1][col + 1].player &&
+        grid[row][col].player === grid[row - 2][col + 2].player &&
+        grid[row][col].player === grid[row - 3][col + 3].player
+      ) {
+        winningDiscs.push(
+          grid[row][col],
+          grid[row - 1][col + 1],
+          grid[row - 2][col + 2],
+          grid[row - 3][col + 3]
+        );
+        winningCoords.push(
+          { row, col },
+          { row: row - 1, col: col + 1 },
+          { row: row - 2, col: col + 2 },
+          { row: row - 3, col: col + 3 }
+        );
+        return {
+          gameOver: true,
+          winner: grid[row][col].player,
+          winningDiscs,
+          winningCoords,
+        };
+      }
+    }
+  }
+
+  // Check for a draw
+  for (let row = 0; row < numRows; row++) {
+    for (let col = 0; col < numCols; col++) {
+      if (grid[row][col].player === null) {
+        return {
+          gameOver: false,
+          winner: null,
+          winningDiscs: [],
+          winningCoords: [],
+        }; // Game is not over yet
+      }
+    }
+  }
+
+  return {
+    gameOver: true,
+    winner: null,
+    winningDiscs: [],
+    winningCoords: [],
+  }; // It's a draw
+};
+
+const getCpuMove = (grid: Disc[][]): number => {
+  const numCols = grid[0]?.length;
+
+  // Prioritize winning move
+  for (let col = 0; col < numCols; col++) {
+    const row = grid.findLastIndex((row) => !row[col].player);
+    if (row !== -1) {
+      // Simulate the move
+      grid[row][col].player = Player.PLAYER_TWO;
+      const result = checkForGameOver(grid);
+      grid[row][col].player = null;
+      if (result.winner === Player.PLAYER_TWO) {
+        return col;
+      }
+    }
+  }
+
+  // Block opponent's winning move
+  for (let col = 0; col < numCols; col++) {
+    const row = grid.findLastIndex((row) => !row[col].player);
+    if (row !== -1) {
+      // Simulate the move
+      grid[row][col].player = Player.PLAYER_ONE;
+      const result = checkForGameOver(grid);
+      grid[row][col].player = null;
+      if (result.winner === Player.PLAYER_ONE) {
+        return col;
+      }
+    }
+  }
+
+  // Play in the first available column
+  for (let col = 0; col < numCols; col++) {
+    if (grid[0][col].player === null) {
+      return col;
+    }
+  }
+
+  return -1; // No valid moves left
 };
 
 export default GameProvider;
