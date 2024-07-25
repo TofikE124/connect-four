@@ -286,8 +286,8 @@ const TurnBackground = () => {
   return (
     <>
       <div
-        className="absolute pointer-events-none z-10 bottom-[40px] left-[50%] w-screen h-[1000px] bg-dark-purple rounded-t-[60px]"
-        style={{ translate: "-50% 100%" }}
+        className="absolute pointer-events-none z-10 bottom-[40px] w-screen left-[calc(50%-50vw)] h-[1000px] bg-dark-purple rounded-t-[60px]"
+        style={{ translate: "0% 100%" }}
       ></div>
       {gameOver ? (
         <motion.div
