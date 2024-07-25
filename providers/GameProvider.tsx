@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import {
   createContext,
   ReactNode,
@@ -73,6 +74,7 @@ const GameProvider = ({ isCpu, children }: GameProviderProps) => {
   > | null>(null);
 
   const playDropSound = useDropAudio();
+  const playConfettiSound = useConfettiAudio();
   const { playTickingSound, pauseTickingSound } = useTickingSound();
 
   const initializeGrid = () => {
@@ -147,6 +149,7 @@ const GameProvider = ({ isCpu, children }: GameProviderProps) => {
     if (result.winner == Player.PLAYER_ONE)
       setPlayerOneScore((score) => score + 1);
     else setPlayerTwoScore((score) => score + 1);
+    playConfettiSound();
   };
 
   const chooseDisc = (col: number) => {
@@ -263,43 +266,84 @@ const GameProvider = ({ isCpu, children }: GameProviderProps) => {
 };
 
 function useDropAudio() {
-  const audioRef = useRef(new Audio("/sounds/drop.mp3"));
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setAudio(new Audio("/sounds/drop.mp3"));
+  }, []);
+  useCleanAudio(audio);
 
   const playSound = useCallback(() => {
-    if (audioRef.current) {
+    if (audio) {
       // Stop any currently playing sound
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
     }
+  }, [audio]);
+
+  return playSound;
+}
+
+function useConfettiAudio() {
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setAudio(new Audio("/sounds/confetti-sound.mp3"));
   }, []);
+  useCleanAudio(audio);
+
+  const playSound = useCallback(() => {
+    if (audio) {
+      // Stop any currently playing sound
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
+    }
+  }, [audio]);
 
   return playSound;
 }
 
 function useTickingSound() {
-  const audioRef = useRef(new Audio("/sounds/timer-ticking.mp3"));
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    setAudio(new Audio("/sounds/timer-ticking.mp3"));
+  }, []);
+
+  useCleanAudio(audio);
 
   const playTickingSound = useCallback(() => {
-    if (audioRef.current) {
+    if (audio) {
       // Stop any currently playing sound
-      if (audioRef.current.paused) audioRef.current.play();
+      if (audio.paused) audio.play();
     }
-  }, []);
+  }, [audio]);
 
   const pauseTickingSound = useCallback(() => {
-    if (audioRef.current) {
+    if (audio) {
       // Stop any currently playing sound
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      audio.pause();
+      audio.currentTime = 0;
     }
-  }, []);
+  }, [audio]);
 
   return {
     playTickingSound,
     pauseTickingSound,
-    isTickingPlayingPlaying: !audioRef.current.paused,
+    isTickingPlayingPlaying: !audio?.paused,
   };
+}
+
+function useCleanAudio(audio: HTMLAudioElement | null) {
+  useEffect(() => {
+    return () => {
+      if (!audio) return;
+      audio.pause();
+      if (audio) audio.currentTime = 0;
+    };
+  }, [audio]);
 }
 
 const checkForGameOver = (grid: Disc[][]): GameResult => {
