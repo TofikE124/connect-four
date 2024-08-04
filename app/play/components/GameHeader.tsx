@@ -17,9 +17,13 @@ const GameHeader = () => {
   };
 
   return (
-    <div className="grid-in-header flex items-center justify-between gap-[80px] w-full">
+    <div className="grid-in-header flex items-center justify-between lgmd:gap-[80px] sm:gap-[10px] w-full">
       <SmallButton onClick={handleMenuClick}>Menu</SmallButton>
-      <Image src={logo} width={52} height={52} alt="Logo icon" />
+      <Image
+        src={logo}
+        alt="Logo icon"
+        className="lgmd:size-[52px] sm:size-[30px]"
+      />
       <SmallButton onClick={restartGame}>Restart</SmallButton>
     </div>
   );

@@ -2,18 +2,34 @@
   font-size: 3.5rem;
   font-weight: 700;
   line-height: 1.26;
+
+  @screen sm {
+    font-size: 2.5rem;
+  }
 }
 
 .heading-m {
   font-size: 1.5rem;
+
+  @screen sm {
+    font-size: 1rem;
+  }
 }
 
 .heading-s {
   font-size: 1.25rem;
+
+  @screen sm {
+    font-size: 0.75rem;
+  }
 }
 
 .heading-xs {
   font-size: 1rem;
+
+  @screen sm {
+    font-size: 0.65rem;
+  }
 }
 
 .heading-m,

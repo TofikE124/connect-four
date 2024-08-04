@@ -17,7 +17,7 @@ const buttonStyles = cva(
     "border-black",
     "hover:border-dark-purple",
     "hover:shadow-dark-purple",
-    "w-[400px]",
+    "lgmd:w-[400px]",
     "uppercase",
     "transition-all",
     "active:translate-y-[4px]",
@@ -31,8 +31,13 @@ const buttonStyles = cva(
         yellow: ["bg-yellow", "text-black"],
       },
       variant: {
-        text: [],
-        "text-with-icon": ["flex", "items-center", "justify-between"],
+        text: ["sm:w-full"],
+        "text-with-icon": [
+          "flex",
+          "items-center",
+          "justify-between",
+          "sm:w-full",
+        ],
         icon: [
           "size-[64px]",
           "rounded-full",
@@ -89,10 +94,8 @@ const Button = ({
       {icon && variant == "text-with-icon" ? (
         <Image
           src={icon}
-          width={82}
-          height={46}
           alt="Icon"
-          className="ml-auto"
+          className="ml-auto lgmd:w-[82px] lgmd:h-[46px] sm:w-[60px] sm:h-[30px]"
         />
       ) : null}
       {icon && variant == "icon" ? (

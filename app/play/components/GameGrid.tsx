@@ -78,14 +78,14 @@ const GameGrid = () => {
     >
       <div
         ref={scope}
-        className="relative z-50 sm:w-[335px] sm:h-[310px] lgmd:w-[632px] lgmd:h-[584px] shadow-[0px_10px_0px_0px_black] flex flex-col justify-center lgmd:gap-6 sm:gap-[12.74px] rounded-b-[40px] sm:p-[10.6px] sm:pb-[31.85px] lgmd:p-[20px] lgmd:pb-[60px] select-none mx-auto"
+        className="relative z-50 xsm:w-[270px] xsm:h-[250px] sm-range:w-[335px] sm-range:h-[310px] lgmd:w-[632px] lgmd:h-[584px] shadow-[0px_10px_0px_0px_black] flex flex-col justify-center lgmd:gap-6 sm-range:gap-[12.74px] xsm:gap-[7.84px] rounded-b-[40px] xsm:p-[6.13px] sm-range:p-[10.6px] xsm:pb-[23.27px] sm-range:pb-[31.85px] lgmd:p-[20px] lgmd:pb-[60px] select-none mx-auto"
         data-grid
       >
         <Rows highlightedCol={highLightedCol}></Rows>
       </div>
-      <div className="absolute inset-0 z-30 sm:bg-[url(/images/board-layer-black-small.svg)] lgmd:bg-[url(/images/board-layer-black-large.svg)] bg-no-repeat rounded-b-[40px]"></div>
-      <div className="absolute inset-0 h-[90%] bg-purple z-20"></div>
-      <div className="absolute inset-0 z-50 sm:bg-[url(/images/board-layer-white-small.svg)] lgmd:bg-[url(/images/board-layer-white-large.svg)] bg-no-repeat"></div>
+      <div className="absolute inset-0 z-30 xsm:bg-[url(/images/board-layer-black-extra-small.svg)] sm-range:bg-[url(/images/board-layer-black-small.svg)] lgmd:bg-[url(/images/board-layer-black-large.svg)] bg-no-repeat rounded-b-[40px]"></div>
+      <div className="absolute inset-0  bg-purple z-20 rounded-[30px]"></div>
+      <div className="absolute inset-0 z-50 xsm:bg-[url(/images/board-layer-white-extra-small.svg)] sm-range:bg-[url(/images/board-layer-white-small.svg)] lgmd:bg-[url(/images/board-layer-white-large.svg)] bg-no-repeat"></div>
       {gameOver ? (
         <div className="absolute inset-0 z-50 overflow-hidden">
           <ReactConfetti></ReactConfetti>
@@ -116,7 +116,7 @@ const Rows = ({ highlightedCol }: RowsProps) => {
       return (
         <div
           key={index}
-          className="relative grid grid-cols-7 lgmd:gap-6 sm:gap-[12.7px]"
+          className="relative grid grid-cols-7 lgmd:gap-6"
           style={{ order: i }}
         >
           {row.map((el, j) => {
@@ -193,7 +193,10 @@ const Disc = ({ row, col, highlightedCol, player, index }: DiscProps) => {
   };
 
   return (
-    <div ref={ref} className="relative lgmd:size-16 sm:size-[34px]">
+    <div
+      ref={ref}
+      className="relative lgmd:size-16 sm-range:size-[34px] xsm:size-[30px]"
+    >
       <div
         data-disc
         data-row={row}
@@ -210,7 +213,7 @@ const Disc = ({ row, col, highlightedCol, player, index }: DiscProps) => {
             data-disc
             data-row={row}
             data-col={col}
-            className={`absolute inset-0 shadow-disc ${PlayerColorMap[player]} rounded-full aspect-square lgmd:p-2 sm:p-1`}
+            className={`absolute inset-0 shadow-disc ${PlayerColorMap[player]} rounded-full aspect-square lgmd:p-2 sm-range:p-1 xsm:pl-[4px] xsm:pr-[2px]`}
             animate={{ y: [calcDistanceFromTop(), 0, -30, 0, -15, 0] }} // More subtle bounces for a Connect 4 disc
             transition={{
               duration: 0.8, // Total duration of the animation

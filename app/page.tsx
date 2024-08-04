@@ -8,9 +8,9 @@ import PlayerVSPlayer from "/public/images/player-vs-player.svg";
 
 export default function Home() {
   return (
-    <main className="w-full h-screen bg-dark-purple">
-      <div className="w-full h-full grid place-items-center">
-        <div className="bg-purple shadow-[0px_10px_0px_0px_black] border-[3px] border-solid border-black rounded-[40px] px-10 py-[70px]">
+    <main className="w-screen h-screen bg-dark-purple">
+      <div className="w-full h-full grid place-items-center sm:px-6">
+        <div className="flex flex-col items-center bg-purple shadow-[0px_10px_0px_0px_black] border-[3px] border-solid border-black rounded-[40px] px-10 py-[70px] sm:w-full">
           <Image
             src={logo}
             width={52}
@@ -18,8 +18,8 @@ export default function Home() {
             alt="Logo icon"
             className="mb-20 mx-auto"
           ></Image>
-          <div className="flex flex-col gap-[30px]">
-            <Link href="/play/player-vs-player">
+          <div className="flex flex-col items-center gap-[30px] w-full">
+            <Link href="/play/player-vs-player" className="w-full">
               <Button
                 color="yellow"
                 variant="text-with-icon"
@@ -30,7 +30,7 @@ export default function Home() {
               </Button>
             </Link>
 
-            <Link href="/play/player-vs-cpu">
+            <Link href="/play/player-vs-cpu" className="w-full">
               <Button
                 color="red"
                 variant="text-with-icon"
@@ -40,7 +40,7 @@ export default function Home() {
                 Player VS CPU
               </Button>
             </Link>
-            <Link href="/rules">
+            <Link href="/rules" className="w-full">
               <Button color="white" variant="text" textPosition="left">
                 Game Rules
               </Button>

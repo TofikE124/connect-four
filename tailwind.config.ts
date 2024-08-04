@@ -8,7 +8,14 @@ const config: Config = {
   ],
   theme: {
     screens: {
+      xsm: {
+        max: "25rem",
+      },
       sm: {
+        max: "48rem",
+      },
+      "sm-range": {
+        min: "25rem",
         max: "48rem",
       },
       md: {
