@@ -1,18 +1,12 @@
 "use client";
-import { useRouter } from "next/navigation";
 import {
   createContext,
   ReactNode,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
-
-export enum Player {
-  PLAYER_ONE = "Player 1",
-  PLAYER_TWO = "Player 2",
-}
+import { Player } from "../app/types/Player";
 
 interface Disc {
   player: Player | null;

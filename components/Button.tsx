@@ -17,7 +17,6 @@ const buttonStyles = cva(
     "border-black",
     "hover:border-dark-purple",
     "hover:shadow-dark-purple",
-    "lgmd:w-[400px]",
     "uppercase",
     "transition-all",
     "active:translate-y-[4px]",
@@ -31,12 +30,13 @@ const buttonStyles = cva(
         yellow: ["bg-yellow", "text-black"],
       },
       variant: {
-        text: ["sm:w-full"],
+        text: ["sm:w-full", "lgmd:w-[400px]"],
         "text-with-icon": [
           "flex",
           "items-center",
           "justify-between",
           "sm:w-full",
+          "lgmd:w-[400px]",
         ],
         icon: [
           "size-[64px]",

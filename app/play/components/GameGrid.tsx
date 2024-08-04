@@ -1,13 +1,16 @@
 "use client";
 import SmallButton from "@/components/SmallButton";
 import useGame from "@/hooks/useGame";
-import { Player } from "@/providers/GameProvider";
+import { Player } from "@/app/types/Player";
 import { motion, stagger, useAnimate } from "framer-motion";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import ReactConfetti from "react-confetti";
 import MarkerRed from "/public/images/marker-red.svg";
 import MarkerYellow from "/public/images/marker-yellow.svg";
+
+import TurnBackgroundRed from "/public/images/turn-background-red.svg";
+import TurnBackgroundYellow from "/public/images/turn-background-yellow.svg";
 
 const GameGrid = () => {
   const {
@@ -78,14 +81,14 @@ const GameGrid = () => {
     >
       <div
         ref={scope}
-        className="relative z-50 xsm:w-[270px] xsm:h-[250px] sm-range:w-[335px] sm-range:h-[310px] lgmd:w-[632px] lgmd:h-[584px] shadow-[0px_10px_0px_0px_black] flex flex-col justify-center lgmd:gap-6 sm-range:gap-[12.74px] xsm:gap-[7.84px] rounded-b-[40px] xsm:p-[6.13px] sm-range:p-[10.6px] xsm:pb-[23.27px] sm-range:pb-[31.85px] lgmd:p-[20px] lgmd:pb-[60px] select-none mx-auto"
+        className="relative z-50 xsm:w-[270px] xsm:h-[250px] sm-range:w-[335px] sm-range:h-[310px] md:w-[500px] md:h-[462px] lg:w-[632px] lg:h-[584px] shadow-[0px_10px_0px_0px_black] flex flex-col justify-center xsm:gap-[7.84px] sm-range:gap-[12.74px] md:gap-[16.58px] lg:gap-6 rounded-b-[40px] xsm:p-[6.13px] xsm:pb-[23.27px] sm-range:p-[10.6px] sm-range:pb-[31.85px] md:p-[13.45px] md:pb-[42px] lg:p-[20px] lg:pb-[60px] select-none mx-auto"
         data-grid
       >
         <Rows highlightedCol={highLightedCol}></Rows>
       </div>
-      <div className="absolute inset-0 z-30 xsm:bg-[url(/images/board-layer-black-extra-small.svg)] sm-range:bg-[url(/images/board-layer-black-small.svg)] lgmd:bg-[url(/images/board-layer-black-large.svg)] bg-no-repeat rounded-b-[40px]"></div>
+      <div className="absolute inset-0 z-30 xsm:bg-[url(/images/board-layer-black-extra-small.svg)] sm-range:bg-[url(/images/board-layer-black-small.svg)] md:bg-[url(/images/board-layer-black-medium.svg)] lg:bg-[url(/images/board-layer-black-large.svg)] bg-no-repeat rounded-b-[40px]"></div>
       <div className="absolute inset-0  bg-purple z-20 rounded-[30px]"></div>
-      <div className="absolute inset-0 z-50 xsm:bg-[url(/images/board-layer-white-extra-small.svg)] sm-range:bg-[url(/images/board-layer-white-small.svg)] lgmd:bg-[url(/images/board-layer-white-large.svg)] bg-no-repeat"></div>
+      <div className="absolute inset-0 z-50 xsm:bg-[url(/images/board-layer-white-extra-small.svg)] sm-range:bg-[url(/images/board-layer-white-small.svg)] md:bg-[url(/images/board-layer-white-medium.svg)] lg:bg-[url(/images/board-layer-white-large.svg)] bg-no-repeat"></div>
       {gameOver ? (
         <div className="absolute inset-0 z-50 overflow-hidden">
           <ReactConfetti></ReactConfetti>
@@ -195,7 +198,7 @@ const Disc = ({ row, col, highlightedCol, player, index }: DiscProps) => {
   return (
     <div
       ref={ref}
-      className="relative lgmd:size-16 sm-range:size-[34px] xsm:size-[30px]"
+      className="relative lg:size-16 md:size-[52px] sm-range:size-[34px] xsm:size-[30px]"
     >
       <div
         data-disc
@@ -239,20 +242,26 @@ const TurnCounter = () => {
   const { playerTurn, timeLeft, playerNamesMap } = useGame();
 
   return (
-    <div
-      className="absolute text-center pointer-events-none sm:bottom-[20px] md:bottom-[40px] lg:bottom-[50px] translate-y-[100%] w-[197px] h-[165px] grid place-content-center left-[50%] translate-x-[-50%]"
-      style={{
-        backgroundImage: `url(${
-          playerTurn == Player.PLAYER_ONE
-            ? "/images/turn-background-red.svg"
-            : "/images/turn-background-yellow.svg"
-        })`,
-      }}
-    >
-      <h3 className="heading-xs uppercase">
-        {playerNamesMap?.[playerTurn]}&#39;s Turn
-      </h3>
-      <h2 className="heading-l">{timeLeft}s</h2>
+    <div className="absolute text-center pointer-events-none sm:bottom-[20px] md:bottom-[45px] lg:bottom-[50px] translate-y-[100%] w-[197px] h-[165px] grid place-content-center left-[50%] translate-x-[-50%]">
+      {playerTurn == Player.PLAYER_ONE ? (
+        <Image
+          src={TurnBackgroundRed}
+          alt="Turn background red"
+          className="absolute inset-0"
+        />
+      ) : (
+        <Image
+          src={TurnBackgroundYellow}
+          alt="Turn background Yellow"
+          className="absolute inset-0"
+        />
+      )}
+      <div className="relative z-20">
+        <h3 className="heading-xs uppercase">
+          {playerNamesMap?.[playerTurn]}&#39;s Turn
+        </h3>
+        <h2 className="heading-l">{timeLeft}s</h2>
+      </div>
     </div>
   );
 };
